@@ -9,7 +9,7 @@ import com.energybox.backendcodingchallenge.domain.Gateway;
 
 public interface GatewayRepository extends Neo4jRepository<Gateway, Long> {
 	
-	@Query(" MATCH (g:Gateway)-[g:CONNECTED_TO]->(s:Sensor) WHERE {sensorType} IN s.types ")
+	@Query(" MATCH (g:Gateway)-[CONNECTED_TO]->(s:Sensor) WHERE $sensorType IN s.types RETURN g ")
 	public List<Gateway> findHavingSensorType(String sensorType);
 
 }

@@ -1,9 +1,7 @@
 package com.energybox.backendcodingchallenge.controller;
 
-import com.energybox.backendcodingchallenge.domain.Gateway;
-import com.energybox.backendcodingchallenge.domain.Sensor;
-import com.energybox.backendcodingchallenge.service.GatewayService;
-import io.swagger.annotations.ApiOperation;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.List;
+import com.energybox.backendcodingchallenge.domain.Gateway;
+import com.energybox.backendcodingchallenge.service.GatewayService;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping( value = "/gateways" )
@@ -40,10 +40,10 @@ public class GatewayController {
     
     @ApiOperation( value = "get all sensors assigned to a gateway", response = Gateway.class )
     @RequestMapping( value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Gateway> getAllSensorsAssigned(@PathVariable String gatewayId) {
+    public ResponseEntity<Gateway> getAllSensorsAssigned(@PathVariable("id") String gatewayId) {
     	try {
     		long id = Long.valueOf(gatewayId);
-    		return ResponseEntity.of(this.service.findById(id));
+    		return ResponseEntity.of(this.service.findGatewayById(id));
     	} catch(NumberFormatException ex) {
     		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     	}
@@ -51,17 +51,26 @@ public class GatewayController {
 
     @ApiOperation( value = "create a gateway", response = Gateway.class )
     @RequestMapping( value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
-    public ResponseEntity<Gateway> create(@RequestBody Object comment) {
+    public ResponseEntity<Gateway> create() {
     	Gateway gateway = this.service.createGateway();
-        return new ResponseEntity<>(gateway, HttpStatus.OK);
+        return new ResponseEntity<>(gateway, HttpStatus.CREATED);
     }
     
-    @ApiOperation( value = "create a gateway", response = Gateway.class )
+    @ApiOperation( value = "assign a sensor to a gateway", response = Gateway.class )
     @RequestMapping( value = "/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
-    public ResponseEntity<Gateway> assign(@PathVariable String gatewayId, 
-    		@RequestParam("sensorId") String sensorId
+    public ResponseEntity<Gateway> assign(@PathVariable("id") String gatewayId,  @RequestParam("sensorId") String sensorId
     	){
-    	Gateway gateway = this.service.createGateway();
-        return new ResponseEntity<>(gateway, HttpStatus.OK);
+    	try {
+    		Gateway gateway = this.service.connectSensorToGateway(Long.valueOf(gatewayId), Long.valueOf(sensorId))
+    			.orElse(null);
+    		
+    		if(gateway == null) {
+    			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    		}
+    		
+    		return new ResponseEntity<>(gateway, HttpStatus.CREATED);
+    	} catch(NumberFormatException ex) {
+    		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    	}
     }
 }

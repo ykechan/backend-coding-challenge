@@ -8,7 +8,10 @@ server:
     mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
     min-response-size: 1024
     
-org:
+spring:
   neo4j:
-    driver:
-      uri: bolt://localhost:7687
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: password
+      
