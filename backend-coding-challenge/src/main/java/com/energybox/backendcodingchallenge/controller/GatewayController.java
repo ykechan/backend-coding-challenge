@@ -50,14 +50,14 @@ public class GatewayController {
     }
 
     @ApiOperation( value = "create a gateway", response = Gateway.class )
-    @RequestMapping( value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
+    @RequestMapping( value = "", method = RequestMethod.POST)
     public ResponseEntity<Gateway> create() {
     	Gateway gateway = this.service.createGateway();
         return new ResponseEntity<>(gateway, HttpStatus.CREATED);
     }
     
     @ApiOperation( value = "assign a sensor to a gateway", response = Gateway.class )
-    @RequestMapping( value = "/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
+    @RequestMapping( value = "/{id}", method = RequestMethod.POST)
     public ResponseEntity<Gateway> assign(@PathVariable("id") String gatewayId,  @RequestParam("sensorId") String sensorId
     	){
     	try {
